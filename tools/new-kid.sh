@@ -20,10 +20,11 @@ WORK=$DIST/$PKG
 [[ -e $WORK || -e $DIST/$PKG.zip ]] && { echo "$WORK 已存在，先删掉"; exit 1; }
 mkdir -p "$DIST"
 
-# 1. 从骨架当前 main 复制（保留历史，之后能直接 cherry-pick 回来）
+# 1. 从 base 当前 main 复制（保留历史，之后能直接 cherry-pick 回来）
 git clone -q --no-local "$ROOT" "$WORK"
 cd "$WORK"
 git rm -rq tools hub
+perl -0pi -e 's/## 分发给孩子 \/ 回收\n.*?\n(?=## )//s' CLAUDE.md   # 这节只对 base 有用
 cat "$ROOT/tools/kid-rules.md" >> CLAUDE.md
 { echo "项目说明见 CLAUDE.md。"; cat "$ROOT/tools/kid-rules.md"; } > AGENTS.md
 git config user.name "$NAME"
@@ -46,7 +47,7 @@ gh api -X POST "repos/$OWNER/$REPO/pages" -f "source[branch]=main" -f "source[pa
 # 5. 打包
 cd "$DIST" && zip -qr "$PKG.zip" "$PKG" && rm -rf "$WORK"
 
-# 6. 加进切换站 + 骨架仓库里加个 remote，方便 cherry-pick
+# 6. 加进切换站 + base 仓库里加个 remote，方便 cherry-pick
 cd "$ROOT"
 python3 - "$ID" "$NAME" "$OWNER/$REPO" <<'PY'
 import json, sys

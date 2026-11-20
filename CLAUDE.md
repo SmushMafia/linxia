@@ -16,9 +16,17 @@ three.js 生态放在 `vendor/`（从 jsDelivr 原样下载，不依赖外部 CD
 
 ## 分发给孩子 / 回收
 
-- `tools/new-kid.sh <id> [显示名]`：在组织 SmushMafia 下建公开仓库 `<id>`（从当前 main 复制，去掉 `tools/ hub/`，往 CLAUDE.md/AGENTS.md 追加 `tools/kid-rules.md` 的自动提交规矩）、加写权限 deploy key、开 Pages，打包 `dist/smushO-<id>.zip`（含密钥，`dist/` 已 gitignore），并写入 `hub/kids.json`。
-- `hub/index.html`：版本切换站（https://smushmafia.github.io/hub/；base 仓库是 `SmushMafia/smushmafia.github.io`，孩子 id 不能和 base 根目录重名），标签 = base + kids.json 里每个孩子的 Pages 最新版（iframe）。
-- `tools/collect.sh`：fetch 所有 `kid-<id>` remote，之后 `git cherry-pick` 收改动。
+全部在 GitHub 组织 SmushMafia 下，靠 GitHub Pages 发布（孩子在本地改和测，公开页面只用于演示和查看）：
+
+| | 仓库 | 网址 |
+|---|---|---|
+| base（本仓库） | `SmushMafia/smushmafia.github.io` | https://smushmafia.github.io/ |
+| 切换站 | 本仓库 `hub/` | https://smushmafia.github.io/hub/ |
+| 孩子 | `SmushMafia/<id>` | https://smushmafia.github.io/<id>/ |
+
+- `tools/new-kid.sh <id> [昵称]`：从当前 main 复制出孩子仓库（去掉 `tools/ hub/` 和本节，往 CLAUDE.md/AGENTS.md 追加 `tools/kid-rules.md` 的自动提交规矩）、加写权限 deploy key、开 Pages，打包 `dist/smushO-<id>.zip`（含密钥，`dist/` 已 gitignore），写入 `hub/kids.json`，本仓库加 remote `kid-<id>`。id 不能和本仓库根目录重名（会盖掉 base 的路径）。
+- `hub/index.html`：标签 = base + kids.json 里每个孩子的 Pages 最新版（iframe）。
+- `tools/collect.sh`：fetch 所有 `kid-<id>` remote，之后 `git cherry-pick` 收改动。base 的通用改动同步给孩子也是逐个 cherry-pick，不整体合并（base 的 `SKILLS` 是空的）。
 
 ## 项目定位
 
@@ -28,7 +36,7 @@ three.js 生态放在 `vendor/`（从 jsDelivr 原样下载，不依赖外部 CD
 
 **配置文件（孩子/AI 改的）**
 - `characters.js` — `CHARACTERS`：名字/颜色/键位/技能列表/出生点。标题、图例、主题色由 main.js 从这里生成。
-- `skills.js` — `SKILLS`（骨架里为空，示例在 `examples/skills.js`，页面不加载）：每个技能 = 一个配置对象，`spawn`（生成什么）× `entity`（`behavior` 怎么动 + `hit` 打击参数）× `look`（`draw` 造型名 + 颜色）。
+- `skills.js` — `SKILLS`（base 里为空，示例在 `examples/skills.js`，页面不加载）：每个技能 = 一个配置对象，`spawn`（生成什么）× `entity`（`behavior` 怎么动 + `hit` 打击参数）× `look`（`draw` 造型名 + 颜色）。
 
 **框架层**
 - `engine.js` — 状态 + 规则，不碰 DOM、不知道 three.js。`cast()` 是所有技能的唯一施放路径；`BEHAVIORS` 按 `entity.behavior` 挑行为。命中统一走 `hitCheck()`/`damage()`：伤害、击退、命中定格 `hitstop`（`hit.stop` 可覆盖）、定向屏震、漂浮字、状态效果（`hit.slow` 减速 / `hit.freeze` 减速中再中则冰冻）都在这里，任何技能配上就生效。
