@@ -24,6 +24,8 @@ three.js 生态放在 `vendor/`（从 jsDelivr 原样下载，不依赖外部 CD
 | 切换站 | 本仓库 `hub/` | https://smushmafia.github.io/hub/ |
 | 孩子 | `SmushMafia/<id>` | https://smushmafia.github.io/<id>/ |
 
+组织必须允许 deploy key（Settings → Repository → Deploy keys；新组织默认禁用，禁用时孩子 push 会被拒，但 `ssh -T` 仍显示认证成功）。
+
 - `tools/new-kid.sh <id> [昵称]`：从当前 main 复制出孩子仓库（去掉 `tools/ hub/` 和本节，往 CLAUDE.md/AGENTS.md 追加 `tools/kid-rules.md` 的自动提交规矩）、加写权限 deploy key、开 Pages，打包 `dist/smushO-<id>.zip`（含密钥，`dist/` 已 gitignore），写入 `hub/kids.json`，本仓库加 remote `kid-<id>`。id 不能和本仓库根目录重名（会盖掉 base 的路径）。
 - `hub/index.html`：标签 = base + kids.json 里每个孩子的 Pages 最新版（iframe）。
 - `tools/collect.sh`：fetch 所有 `kid-<id>` remote，之后 `git cherry-pick` 收改动。base 的通用改动同步给孩子也是逐个 cherry-pick，不整体合并（base 的 `SKILLS` 是空的）。
