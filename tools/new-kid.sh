@@ -10,6 +10,8 @@ NAME=${2:-$ID}
 [[ $ID =~ ^[a-z0-9-]+$ ]] || { echo "id 只能用小写字母、数字、-（GitHub 仓库名不支持中文）"; exit 1; }
 
 ROOT=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)
+# base 是组织主页 smushmafia.github.io，孩子网址是 smushmafia.github.io/<id>/，同名会盖掉 base 的目录
+[[ -e $ROOT/$ID ]] && { echo "id 不能叫 $ID（和 base 里的目录重名）"; exit 1; }
 OWNER=${SMUSHO_ORG:-SmushMafia}   # 孩子仓库都放在这个组织下
 REPO=$ID
 PKG=smushO-$ID     # 新手包文件夹 / zip 名
