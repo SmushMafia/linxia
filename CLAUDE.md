@@ -16,7 +16,7 @@ three.js 生态放在 `vendor/`（从 jsDelivr 原样下载，不依赖外部 CD
 
 ## 分发给孩子 / 回收
 
-- `tools/new-kid.sh <id> [显示名]`：建公开仓库 `smushO-<id>`（从当前 main 复制，去掉 `tools/ hub/`，往 CLAUDE.md/AGENTS.md 追加 `tools/kid-rules.md` 的自动提交规矩）、加写权限 deploy key、开 Pages，打包 `dist/smushO-<id>.zip`（含密钥，`dist/` 已 gitignore），并写入 `hub/kids.json`。
+- `tools/new-kid.sh <id> [显示名]`：在组织 SmushMafia 下建公开仓库 `<id>`（从当前 main 复制，去掉 `tools/ hub/`，往 CLAUDE.md/AGENTS.md 追加 `tools/kid-rules.md` 的自动提交规矩）、加写权限 deploy key、开 Pages，打包 `dist/smushO-<id>.zip`（含密钥，`dist/` 已 gitignore），并写入 `hub/kids.json`。
 - `hub/index.html`：版本切换站，标签 = 骨架 + kids.json 里每个孩子的 Pages 最新版（iframe）。
 - `tools/collect.sh`：fetch 所有 `kid-<id>` remote，之后 `git cherry-pick` 收改动。
 
