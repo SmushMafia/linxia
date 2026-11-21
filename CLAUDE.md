@@ -14,22 +14,6 @@ three.js 生态放在 `vendor/`（从 jsDelivr 原样下载，不依赖外部 CD
 
 两种脚本混用：`skills.js → characters.js → fx.js → engine.js` 是普通 `<script>`，靠全局变量串联；`render.js`、`main.js` 是 ES 模块（模块里能直接读写这些全局 `let`/`const`）。`main.js` 用 `window.keys` 把键盘状态暴露给 engine.js。
 
-## 分发给孩子 / 回收
-
-全部在 GitHub 组织 SmushMafia 下，靠 GitHub Pages 发布（孩子在本地改和测，公开页面只用于演示和查看）：
-
-| | 仓库 | 网址 |
-|---|---|---|
-| base（本仓库） | `SmushMafia/smushmafia.github.io` | https://smushmafia.github.io/ |
-| 切换站 | 本仓库 `hub/` | https://smushmafia.github.io/hub/ |
-| 孩子 | `SmushMafia/<id>` | https://smushmafia.github.io/<id>/ |
-
-组织必须允许 deploy key（Settings → Repository → Deploy keys；新组织默认禁用，禁用时孩子 push 会被拒，但 `ssh -T` 仍显示认证成功）。
-
-- `tools/new-kid.sh <id> [昵称]`：从当前 main 复制出孩子仓库（去掉 `tools/ hub/` 和本节，往 CLAUDE.md/AGENTS.md 追加 `tools/kid-rules.md` 的自动提交规矩）、加写权限 deploy key、开 Pages，打包 `dist/smushO-<id>.zip`（含密钥，`dist/` 已 gitignore），写入 `hub/kids.json`，本仓库加 remote `kid-<id>`。id 不能和本仓库根目录重名（会盖掉 base 的路径）。
-- `hub/index.html`：标签 = base + kids.json 里每个孩子的 Pages 最新版（iframe）。
-- `tools/collect.sh`：fetch 所有 `kid-<id>` remote，之后 `git cherry-pick` 收改动。base 的通用改动同步给孩子也是逐个 cherry-pick，不整体合并（base 的 `SKILLS` 是空的）。
-
 ## 项目定位
 
 本地双人同键盘对战游戏的最简框架，目标用户是初中生（口述点子、AI 改配置）。改动要保持这个定位：**优先加配置，不加抽象**；文档和注释精简、机制为主、不自创 flavor。
@@ -62,3 +46,11 @@ three.js 生态放在 `vendor/`（从 jsDelivr 原样下载，不依赖外部 CD
 - `prefers-reduced-motion`（fx.js 的 `REDUCED`）：屏震/闪白/慢动作/KO 推镜头关闭，粒子数量 ×0.4。
 - 键位两套写法：`CHARACTERS.keys` 写键码（`KeyW`/`ArrowUp`），`SKILLS.key` 写标注（`'Q'`/`'.'`），换算在 engine.js 顶部。
 - 素材占位：`CHARACTERS[i].image` / `look.image` 可选，写了就用图片面片代替程序模型，未写或未加载完回退程序模型。
+
+## 给改游戏的 agent：自动提交
+
+这份是某个孩子自己的游戏副本，改动会自动收回给大人。
+
+- 每完成一个能玩的改动，立刻提交并推送：`git add -A && git commit -m "<一句话说改了什么>" && git push`
+- 推送地址和密钥已经配好，不要改 git 配置（`remote`、`core.sshCommand`），不要删 `.git`。
+- push 失败就告诉孩子，不要 `--force`。
