@@ -390,18 +390,19 @@ const LOOKS = {
       if (light){ light.l.position.copy(g.position); light.l.intensity = 3200; }
     } };
   },
-  sonic(en){ // 声波：几圈同心波纹跟着 en.radius 扩散
+  sonic(en){ // 声波弹：同心波纹裹着弹体飞行，随年龄脉动
     const c = (en.look && en.look.color) || '#ffd34d', g = new THREE.Group();
-    const rings = [1, .78, .56].map((k, i) => {
+    const rings = [1, .72, .46].map((k, i) => {
       const m = basic(hdrC(c, 2.6 - i*.5), { transparent:true, opacity:1, depthWrite:false, side:THREE.DoubleSide });
       const r = new THREE.Mesh(GEO.flatRing, m); r.rotation.x = -Math.PI/2; r.position.y = 2 + i; g.add(r);
       return { mesh:r, mat:m, k };
     });
-    pulseLight(en.x, en.y, c, 6000);
-    return { obj:g, update(en, t){
-      const rad = Math.max(1, en.radius || 0), fadeK = Math.min(1, en.life/.25);
+    const light = takeLight(en, c);
+    return { obj:g, light, update(en, t){
+      const pulse = 1 + Math.sin(en.age*22)*.14, fadeK = Math.min(1, en.life/.25);
       g.position.set(wx(en.x), 0, wz(en.y));
-      for (const { mesh, mat, k } of rings){ mesh.scale.set(rad*k, rad*k, 1); mat.opacity = fadeK; }
+      for (const { mesh, mat, k } of rings){ const s = en.r*k*2*pulse; mesh.scale.set(s, s, 1); mat.opacity = fadeK; }
+      if (light){ light.l.position.copy(g.position).setY(24); light.l.intensity = 3000*pulse; }
     } };
   },
   none(){ return { obj: new THREE.Group(), update(){} }; },
