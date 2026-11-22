@@ -366,6 +366,20 @@ const LOOKS = {
         s.position.set(Math.cos(s.userData.a)*r*.9, h/2, Math.sin(s.userData.a)*r*.9); s.scale.set(4, Math.max(.01, h), 4); }
     } };
   },
+  sonic(en){ // 声波：几圈同心波纹跟着 en.radius 扩散
+    const c = (en.look && en.look.color) || '#ffd34d', g = new THREE.Group();
+    const rings = [1, .78, .56].map((k, i) => {
+      const m = basic(hdrC(c, 2.6 - i*.5), { transparent:true, opacity:1, depthWrite:false, side:THREE.DoubleSide });
+      const r = new THREE.Mesh(GEO.flatRing, m); r.rotation.x = -Math.PI/2; r.position.y = 2 + i; g.add(r);
+      return { mesh:r, mat:m, k };
+    });
+    pulseLight(en.x, en.y, c, 6000);
+    return { obj:g, update(en, t){
+      const rad = Math.max(1, en.radius || 0), fadeK = Math.min(1, en.life/.25);
+      g.position.set(wx(en.x), 0, wz(en.y));
+      for (const { mesh, mat, k } of rings){ mesh.scale.set(rad*k, rad*k, 1); mat.opacity = fadeK; }
+    } };
+  },
   none(){ return { obj: new THREE.Group(), update(){} }; },
 };
 

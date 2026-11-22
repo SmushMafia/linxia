@@ -15,4 +15,12 @@
    key 是按键（字母直接写，如 'Q'；符号写 '.' '/' 等）；desc 显示在键位图例里。
    ============================================================================ */
 const SKILLS = {
+  sonic: { // 声波：从自身扩散的波纹，震到直接 KO
+    label:'声波震击', key:'Q', cd:8, desc:'🔊 声波扩散，震到直接 KO',
+    spawn:{ count:1, at:'self' },
+    entity:{ behavior:'nova', radius:900, expand:.42, life:.9, damage:100,
+      hit:{ knockback:380, shake:12, stop:.22, burst:'spark', pop:'震碎！' } },
+    look:{ draw:'sonic', color:'#ffd34d' },
+    shout:'声波，震！'
+  },
 };
