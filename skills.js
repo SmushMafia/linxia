@@ -23,12 +23,12 @@ const SKILLS = {
     look:{ draw:'sonic', color:'#ffd34d' },
     shout:'声波，发射！'
   },
-  coaster: { // 过山车：车厢沿起伏轨道追着对手俯冲，撞到直接 KO
-    label:'过山车', key:'E', cd:9, desc:'🎢 车厢俯冲撞飞，撞到直接 KO',
+  coaster: { // 过山车：车厢沿起伏轨道追着对手俯冲，撞到直接 KO；对手静止时撞不到
+    label:'过山车', key:'E', cd:9, desc:'🎢 对手移动时才撞得中，撞到直接 KO',
     spawn:{ count:1, at:'self' },
     entity:{ behavior:'seek', speed:520, accel:1500, life:4, r:30, damage:100,
       trail:'#ff5a3d',
-      hit:{ knockback:520, shake:14, stop:.3, burst:'star', pop:'撞飞！' } },
+      hit:{ knockback:520, shake:14, stop:.3, burst:'star', pop:'撞飞！', requireMoving:true } },
     look:{ draw:'coaster' },
     shout:'过山车，出发！'
   },

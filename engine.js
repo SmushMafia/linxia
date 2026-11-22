@@ -6,6 +6,7 @@
 const W = 960, H = 560, WALL = 14, TOP = 78;
 const ENTITY_CAP = 200; // 观赏兜底：点子不拒绝，量级悄悄截断
 const TUNING = { moveSpeed:230, moveAccel:1700, friction:.0008 }; // 「想跑得更快」改这里
+const isMoving = p => ['up','down','left','right'].some(k => keys[p.kmap[k]]); // 是否正按着方向键
 
 /* ---------- 键位标注 ↔ 键码（SKILLS.key 写 'Q' / '.'，这里换算成 e.code） ---------- */
 const LABEL_CODE = { '.':'Period', '/':'Slash', ',':'Comma', ';':'Semicolon', ' ':'Space' };
@@ -145,6 +146,10 @@ function hitCheck(en, foe){
   if (foe.dead) return;
   if (Math.hypot(en.x - foe.x, en.y - foe.y) > en.r + foe.r) return;
   const h = en.cfg.hit || {};
+  if (h.requireMoving && !isMoving(foe)){ // 静止目标打不中：穿过去，弹提示
+    if (!en.tipShown){ en.tipShown = true; popText(foe.x, foe.y - foe.r - 18, '静止打不中！', '#8a6cf0', 18); }
+    return;
+  }
   damage(foe, en.cfg.damage || 0, en.x, en.y, h);
   if (h.stun){ foe.stun = Math.max(foe.stun, h.stun); const a = Math.atan2(foe.y-en.y, foe.x-en.x); foe.vx = Math.cos(a)*h.slide; foe.vy = Math.sin(a)*h.slide; }
   burst(en.x, en.y, h.burst || 'star', 10);
