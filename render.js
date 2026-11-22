@@ -61,6 +61,7 @@ const GEO = {
   cone: new THREE.ConeGeometry(1, 1, 12), plane: new THREE.PlaneGeometry(1, 1),
   smile: new THREE.TorusGeometry(.2, .045, 6, 16, Math.PI), banana: new THREE.TorusGeometry(13, 4.5, 10, 24, Math.PI*.5),
   ring: new THREE.TorusGeometry(1, .05, 6, 48), star: starGeometry(),
+  box: new THREE.BoxGeometry(1, 1, 1),
   flatRing: new THREE.RingGeometry(.9, 1, 72), disc: new THREE.CircleGeometry(1, 48), crystal: new THREE.IcosahedronGeometry(1, 1),
 };
 const MAT = {
@@ -364,6 +365,29 @@ const LOOKS = {
       ringM.opacity = fadeK; discM.opacity = .3*fadeK;
       for (const s of shards){ const h = s.userData.h * grow * fadeK;
         s.position.set(Math.cos(s.userData.a)*r*.9, h/2, Math.sin(s.userData.a)*r*.9); s.scale.set(4, Math.max(.01, h), 4); }
+    } };
+  },
+  coaster(en){ // 过山车：一节俯冲的车厢，四个轮子 + 露头的乘客，沿轨道起伏俯仰
+    const g = new THREE.Group(), car = new THREE.Group(); g.add(car);
+    const body = mesh(GEO.box, toon('#e8433c')); body.scale.set(46, 20, 30); car.add(body);
+    const stripe = mesh(GEO.box, MAT.star); stripe.scale.set(47, 5, 31); stripe.position.y = 8; car.add(stripe);
+    for (const s of [-1, 1]){
+      const rail = mesh(GEO.box, basic('#8d2b22')); rail.scale.set(50, 4, 4); rail.position.set(0, 13, s*14); car.add(rail);
+      const head = mesh(GEO.lowSphere, toon('#f08c1e')); head.scale.setScalar(8); head.position.set(s*11, 18, 0); car.add(head);
+      const eye = mesh(GEO.lowSphere, MAT.ink, false); eye.scale.setScalar(2); eye.position.set(s*11 + 5, 19, 6); car.add(eye);
+    }
+    const wheels = [];
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]){
+      const w = mesh(GEO.lowSphere, MAT.ink); w.scale.setScalar(7); w.position.set(sx*15, -12, sz*13); car.add(w); wheels.push(w);
+    }
+    const light = takeLight(en, '#ff5a3d');
+    return { obj:g, light, update(en, t){
+      const bob = Math.sin(en.age*11)*7, pitch = Math.cos(en.age*11)*.22; // 沿轨道起伏 + 俯仰
+      g.position.set(wx(en.x), 26 + bob, wz(en.y));
+      g.rotation.y = -Math.atan2(en.vy, en.vx);
+      car.rotation.z = pitch;
+      wheels.forEach(w => w.rotation.x = en.age*30);
+      if (light){ light.l.position.copy(g.position); light.l.intensity = 3200; }
     } };
   },
   sonic(en){ // 声波：几圈同心波纹跟着 en.radius 扩散
